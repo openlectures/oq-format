@@ -2,19 +2,18 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
-import javax.swing.JScrollPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class FormatterGUI {
 
@@ -81,7 +80,7 @@ public class FormatterGUI {
 		txtrQuestion.setWrapStyleWord(true);
 		txtrQuestion.setLineWrap(true);
 		txtrQuestion.setText("Question");
-		txtrQuestion.addKeyListener(new EnterListener());
+		txtrQuestion.getDocument().addDocumentListener(new TextAreaListener());
 
 		scrollPane_3 = new JScrollPane();
 		GridBagConstraints gbc_scrollPane_3 = new GridBagConstraints();
@@ -111,7 +110,7 @@ public class FormatterGUI {
 		txtrAnswer.setWrapStyleWord(true);
 		txtrAnswer.setLineWrap(true);
 		txtrAnswer.setText("Answer");
-		txtrAnswer.addKeyListener(new EnterListener());
+		txtrAnswer.getDocument().addDocumentListener(new TextAreaListener());
 
 		scrollPane_2 = new JScrollPane();
 		GridBagConstraints gbc_scrollPane_2 = new GridBagConstraints();
@@ -126,7 +125,7 @@ public class FormatterGUI {
 		txtrHashtags.setWrapStyleWord(true);
 		txtrHashtags.setLineWrap(true);
 		txtrHashtags.setText("Hashtags (Separate by spaces)");
-		txtrHashtags.addKeyListener(new EnterListener());
+		txtrHashtags.getDocument().addDocumentListener(new TextAreaListener());
 
 		scrollPane.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.LOWERED));
@@ -136,31 +135,74 @@ public class FormatterGUI {
 				.createEtchedBorder(EtchedBorder.LOWERED));
 		scrollPane_3.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.LOWERED));
-		scrollPane.addKeyListener(new EnterListener());
-		scrollPane_1.addKeyListener(new EnterListener());
-		scrollPane_2.addKeyListener(new EnterListener());
-		scrollPane_3.addKeyListener(new EnterListener());
+
+		txtrQuestion.addMouseListener(new ClearListener());
+		txtrAnswer.addMouseListener(new ClearListener());
+		txtrHashtags.addMouseListener(new ClearListener());
+	}
+
+	public class ClearListener implements MouseListener {
+
+		public boolean changed;
+
+		public ClearListener() {
+			changed = false;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (!changed) {
+				JTextArea textArea = (JTextArea) e.getSource();
+				textArea.setText("");
+				changed = true;
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
 
 	}
 
-	public class EnterListener implements KeyListener {
+	public class TextAreaListener implements DocumentListener {
 
 		@Override
-		public void keyTyped(KeyEvent e) {
+		public void insertUpdate(DocumentEvent e) {
 			FormatWorker formatWorker = new FormatWorker();
 			formatWorker.execute();
-
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e) {
-
+		public void removeUpdate(DocumentEvent e) {
+			FormatWorker formatWorker = new FormatWorker();
+			formatWorker.execute();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e) {
+		public void changedUpdate(DocumentEvent e) {
 
 		}
+
 	}
 
 	public class FormatWorker extends SwingWorker<String, Void> {
@@ -175,7 +217,7 @@ public class FormatterGUI {
 			try {
 				formatter.format();
 			} catch (StringIndexOutOfBoundsException e) {
-				
+
 			}
 
 			return formatter.getPost();
