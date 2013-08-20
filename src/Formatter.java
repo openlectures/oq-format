@@ -44,7 +44,7 @@ public class Formatter {
 
 	public void format() {
 		questionf = question;
-		
+
 		if (question.charAt(0) == '"') {
 			questionf = question.substring(1);
 		}
@@ -56,7 +56,7 @@ public class Formatter {
 		questionf = questionf.replaceAll("\"\"", "\"");
 
 		questionf = "Q: " + questionf;
-		
+
 		answerf = answer;
 
 		if (answer.charAt(0) == '"') {
